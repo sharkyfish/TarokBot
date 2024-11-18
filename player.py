@@ -6,6 +6,62 @@ class Player:
         self.name = name
         self.hand = []
         self.tricks_won = []
+        self.has_passed = False  # Track if the player has passed during bidding
+
+    
+    def decide_bid(self, current_bid, valid_bids):
+        """
+        Decide whether to bid or pass. Only considers bids 'one' and 'two'
+        """
+        # Filter valid bids to only include 'one' and 'two'
+        simplified_bids = [bid for bid in valid_bids if bid["name"] in ["one", "two"]]
+
+        if not simplified_bids or random.random() > 0.5:
+            # Pass if no valid bids or randomly decides to pass
+            return "pass"
+        else:
+            # Randomly select from the simplified valid bids
+            return random.choice(simplified_bids)
+        
+    
+    def choose_suit(self):
+        """
+        Randomly chooses a suit for calling the king.
+        """
+        suit_choices = ['Clubs', 'Spades', 'Hearts', 'Diamonds']
+        chosen_suit = random.choice(suit_choices)
+
+        return chosen_suit
+
+
+    def choose_talon_set(self, num_sets):
+        """
+        Randomly chooses a set of cards from the talon.
+        """
+        chosen_set_index = random.randint(1, num_sets)  # Talon sets are 1-indexed
+        return chosen_set_index
+
+
+    def discard_cards(self, num_to_discard):
+        """
+        Randomly discards the specified number of cards from the player's hand,
+        ensuring high-value cards (e.g., kings, trula cards) are not discarded.
+        """
+        # High-value cards to protect
+        protected_cards = [card for card in self.hand if 
+                        card.rank == "King" or 
+                        (card.suit == "Tarok" and card.rank in {"1", "21", "22"})]
+        
+        # Cards eligible for discard
+        discardable_cards = [card for card in self.hand if card not in protected_cards]   
+        discarded = random.sample(discardable_cards, num_to_discard)
+        
+        # Remove the discarded cards from the hand and add them to the winning tricks pile
+        for card in discarded:
+            self.tricks_won.append(card)
+            self.hand.remove(card)
+        
+        return discarded
 
 
     def choose_card_to_play(self, lead_suit):
