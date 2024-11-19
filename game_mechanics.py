@@ -218,30 +218,33 @@ def exchange_with_talon(declarer, talon, contract):
     return opponents_talon
 
 
-def play_trick(players, lead_player_index, print_trick=False):
+def play_trick(players, lead_player_index, deck, talon, all_cards_played, print_trick=False):
     trick = []  # Cards played in the trick
 
     # Lead player plays a card
-    lead_card = players[lead_player_index].choose_card_to_play(None)  # No lead suit for the first player
+    lead_card = players[lead_player_index].choose_card_to_play(None, deck, talon, all_cards_played, trick)  # No lead suit for the first player
     trick.append((players[lead_player_index], lead_card))
     lead_suit = lead_card.suit  # Suit of the lead card
 
     # Each other player takes their turn
     for i in range(1, len(players)):
         player = players[(lead_player_index + i) % len(players)]
-        card_to_play = player.choose_card_to_play(lead_suit)
+        card_to_play = player.choose_card_to_play(lead_suit, deck, talon, all_cards_played, trick)
         trick.append((player, card_to_play))
 
     # Determine the winner of the trick
     winner = determine_trick_winner(trick, lead_suit)
     winner.add_trick([card for _, card in trick])  # Add the cards to the winner's tricks_won
 
+    # Update the list of all cards played in the game
+    all_cards_played.extend([card for _, card in trick])
+
     if print_trick:
         # Print cards played in the trick
         for player, card in trick:
             print(f"{player.name} played: {card}")
 
-    return winner
+    return winner, all_cards_played
 
 
 def determine_trick_winner(trick, lead_suit):

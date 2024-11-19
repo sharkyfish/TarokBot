@@ -58,10 +58,14 @@ def play_one_game(deck, players, dealer_index):
 
     # 4. Play the game
     #########################################################################################
+
+    # Track which cards have been played so far
+    all_cards_played = []
+
     lead_player_index = (dealer_index + 1) % len(players) # forehand leads the first trick
     for _ in range(12):  # Each player plays 12 cards; 12 tricks in total
 
-        winner = play_trick(players, lead_player_index, print_trick=False)
+        winner, all_cards_played = play_trick(players, lead_player_index, deck, talon, all_cards_played, print_trick=False)
         # print(f"{winner.name} wins the trick.\n")
         lead_player_index = players.index(winner)
 
@@ -114,7 +118,7 @@ if __name__ == "__main__":
     dealer_index = 0 
 
     # Simulate multiple games
-    for game_number in range(5):  # Simulate games
+    for game_number in range(1):  # Simulate games
 
         print(f"\n=== Game {game_number + 1} ===")
 
