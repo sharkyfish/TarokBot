@@ -65,7 +65,7 @@ def play_one_game(deck, players, dealer_index):
     lead_player_index = (dealer_index + 1) % len(players) # forehand leads the first trick
     for _ in range(12):  # Each player plays 12 cards; 12 tricks in total
 
-        winner, all_cards_played = play_trick(players, lead_player_index, deck, talon, all_cards_played, print_trick=False)
+        winner, all_cards_played = play_trick(players, lead_player_index, declarer, deck, talon, all_cards_played, print_trick=False)
         # print(f"{winner.name} wins the trick.\n")
         lead_player_index = players.index(winner)
 

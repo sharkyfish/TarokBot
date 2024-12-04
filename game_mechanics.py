@@ -1,6 +1,5 @@
 import random
 
-
 # Define the possible contracts in the game
 CONTRACTS = [
     {"name": "klop", "score": -70, "description": "Avoid taking points; available to forehand only."},
@@ -16,7 +15,7 @@ CONTRACTS = [
     {"name": "colour valat without", "score": 125, "description": "Win all tricks; no cards from the talon."},
     {"name": "valat without", "score": 500, "description": "Win all tricks; no bonuses."}
 ]
-
+called_king = None
 
 def shuffle_and_deal(deck, num_players=4):
     random.shuffle(deck)
@@ -134,6 +133,7 @@ def call_king(declarer, talon, players):
     """
     Handles the process of calling a king and determining partnerships.
     """
+    global called_king
     print(f"{declarer.name} must call a king.")
     
     # Declarer chooses a suit
@@ -141,7 +141,6 @@ def call_king(declarer, talon, players):
     print(f"{declarer.name} calls the King of {chosen_suit}.")
     
     # Search for the king in players' hands and the talon
-    called_king = None
     partner = None
     for player in players:
         if player != declarer:  # Skip declarer
@@ -218,18 +217,18 @@ def exchange_with_talon(declarer, talon, contract):
     return opponents_talon
 
 
-def play_trick(players, lead_player_index, deck, talon, all_cards_played, print_trick=False):
+def play_trick(players, lead_player_index, declarer, deck, talon, all_cards_played, print_trick=False):
     trick = []  # Cards played in the trick
 
     # Lead player plays a card
-    lead_card = players[lead_player_index].choose_card_to_play(None, deck, talon, all_cards_played, trick)  # No lead suit for the first player
+    lead_card = players[lead_player_index].choose_card_to_play(None, deck, talon, all_cards_played, trick, lead_player_index, players, declarer)  # No lead suit for the first player
     trick.append((players[lead_player_index], lead_card))
     lead_suit = lead_card.suit  # Suit of the lead card
 
     # Each other player takes their turn
     for i in range(1, len(players)):
         player = players[(lead_player_index + i) % len(players)]
-        card_to_play = player.choose_card_to_play(lead_suit, deck, talon, all_cards_played, trick)
+        card_to_play = player.choose_card_to_play(lead_suit, deck, talon, all_cards_played, trick, lead_player_index, players, declarer)
         trick.append((player, card_to_play))
 
     # Determine the winner of the trick
