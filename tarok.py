@@ -2,6 +2,7 @@ from player import Player
 from deck import Card, create_deck
 from game_mechanics import shuffle_and_deal, sort_hand, bidding_phase, play_trick, determine_trick_winner, calculate_points, call_king, exchange_with_talon, CONTRACTS
 from ai_player import AIPlayer
+from minmax_ai_player import MinMaxAIPlayer
 
 
 # --- Main Game Loop ---
@@ -111,8 +112,9 @@ if __name__ == "__main__":
     deck = create_deck()
 
     # create the players
-    player_names = ["Player 1", "Player 2", "Player 3", "Player 4"]
-    players = [AIPlayer(name) for name in player_names] # AI players from the AIPlayer class
+    player_names = ["Jonez", "B.D.", "Jayson", "Richard Crusher"]
+    players = [Player(player_names[i]) for i in range(len(player_names) - 1)]
+    players.append(MinMaxAIPlayer(player_names[len(player_names) - 1]))
     
     # Initial dealer (first game)
     dealer_index = 0 

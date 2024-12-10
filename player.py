@@ -64,7 +64,7 @@ class Player:
         return discarded
 
 
-    def choose_card_to_play(lead_suit, deck, talon, all_cards_played, current_trick_cards):
+    def choose_card_to_play(self, lead_suit, deck, talon, all_cards_played, trick, lead_player_index, players, declarer):
         """
         Decides which card to play based on the lead suit and available game state.
         Parameters:

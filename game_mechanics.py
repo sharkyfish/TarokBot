@@ -15,7 +15,7 @@ CONTRACTS = [
     {"name": "colour valat without", "score": 125, "description": "Win all tricks; no cards from the talon."},
     {"name": "valat without", "score": 500, "description": "Win all tricks; no bonuses."}
 ]
-called_king = None
+chosen_suit = None
 
 def shuffle_and_deal(deck, num_players=4):
     random.shuffle(deck)
@@ -133,7 +133,7 @@ def call_king(declarer, talon, players):
     """
     Handles the process of calling a king and determining partnerships.
     """
-    global called_king
+    global chosen_suit
     print(f"{declarer.name} must call a king.")
     
     # Declarer chooses a suit
@@ -147,7 +147,6 @@ def call_king(declarer, talon, players):
             for card in player.hand:
                 if card.rank == "King" and card.suit == chosen_suit:
                     partner = player
-                    called_king = card
                     break
             if partner:
                 break
