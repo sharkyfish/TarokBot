@@ -17,6 +17,9 @@ CONTRACTS = [
 ]
 chosen_suit = None
 
+def get_chosen_suit():
+    return chosen_suit
+
 def shuffle_and_deal(deck, num_players=4):
     random.shuffle(deck)
     talon = deck[:6]  # The first 6 cards form the talon
