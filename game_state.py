@@ -84,8 +84,6 @@ class GameState:
                         return allies
                     
             return allies
-        
-        print(get_chosen_suit())
 
         self.allies: Team = Team(
             name = "Allies",
