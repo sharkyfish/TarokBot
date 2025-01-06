@@ -3,10 +3,11 @@ from deck import Card, create_deck
 from game_mechanics import shuffle_and_deal, sort_hand, bidding_phase, play_trick, determine_trick_winner, calculate_points, call_king, exchange_with_talon, CONTRACTS
 from ai_player import AIPlayer
 from minmax_ai_player import MinMaxAIPlayer
+import csv
 
 
 # --- Main Game Loop ---
-def play_one_game(deck, players, dealer_index):
+def play_one_game(deck, players, ai_player, dealer_index):
 
     # 1. shuffle and deal the deck
     #########################################################################################
@@ -99,8 +100,16 @@ def play_one_game(deck, players, dealer_index):
     # Determine the winning team
     if declarer_team_score >= opponents_score:
         print(f"\nDeclarer's team wins the game!")
+        print(f"{declarer_team}")
     else:
         print(f"\nOpponents win the game!")
+        print(f"{opponents_team}")
+
+    with open('data.csv', 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows([ai_player.data])
+
+    ai_player.data = []
 
     return declarer_team_score
 
@@ -112,19 +121,20 @@ if __name__ == "__main__":
     deck = create_deck()
 
     # create the players
-    player_names = ["Jonez", "B.D.", "Jayson", "Richard Crusher"]
+    player_names = ["Jonez", "B.D.", "Jayson", "Richard Crusher (MinMax)"]
     players = [Player(player_names[i]) for i in range(len(player_names) - 1)]
-    players.append(MinMaxAIPlayer(player_names[len(player_names) - 1]))
+    ai_player = MinMaxAIPlayer(player_names[len(player_names) - 1])
+    players.append(ai_player)
     
     # Initial dealer (first game)
     dealer_index = 0 
 
     # Simulate multiple games
-    for game_number in range(1):  # Simulate games
+    for game_number in range(10):  # Simulate games
 
         print(f"\n=== Game {game_number + 1} ===")
 
-        declarer_team_score = play_one_game(deck, players, dealer_index) # Play one game
+        declarer_team_score = play_one_game(deck, players, ai_player, dealer_index) # Play one game
 
         dealer_index = (dealer_index + 1) % len(players)  # Rotate the dealer
         print("\n---\n")

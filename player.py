@@ -7,6 +7,10 @@ class Player:
         self.hand = []
         self.tricks_won = []
         self.has_passed = False  # Track if the player has passed during bidding
+        self.data = []
+
+    def __repr__(self):
+        return self.name
 
     
     def decide_bid(self, current_bid, valid_bids):

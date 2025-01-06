@@ -14,7 +14,8 @@ class GameState:
         for player in self.players:
             if player.name == ai_player.name:
                 self.ai_player = player
-            elif player.name == declarer.name:
+                
+            if player.name == declarer.name:
                 self.declarer = player
 
         # Record the current trick in progress, as well as other card info
@@ -28,11 +29,11 @@ class GameState:
         self.talon = talon
         self.lead_suit = lead_suit
 
-        # Record cards known the AI knows where are
+        # Record cards the AI knows where are
         self.known_cards = [card for card in ai_player.hand]
 
         self.known_cards.extend(talon)
-        self.known_cards.extend([card[1] for card in all_cards_played])
+        self.known_cards.extend(all_cards_played)
         self.known_cards.extend([card[1] for card in trick])
         
         self.unknown_cards = []

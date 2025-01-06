@@ -1,8 +1,9 @@
 from player import Player
 from game_state import GameState
 from game_mechanics import determine_trick_winner, calculate_points
-import random
 import copy
+import time
+import math
 
 class MinMaxAIPlayer(Player): # Inherit from the Player class
 
@@ -30,9 +31,10 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
         
         # Debug Code
         self.game = 0
-        self.trick = 0
+        start_time = time.time()
+        trick = 13 - len(self.hand)
 
-        self.max_depth = 11
+        max_depth = 3
 
         def min_max(game_state: GameState):
 
@@ -80,17 +82,11 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
 
                 trick_winner = assign_trick()
 
-                # Debug Code
-                #self.trick += 1
-                #print("Trick: " + str(self.trick))
-                #print(trick_winner.name + " wins the trick")
-                #print(" Cards in trick: " + str([(card[0].name, card[1]) for card in game_state.trick]))
-
                 # Empty trick variable for next round and set the lead suit to None
                 game_state.trick = []
                 game_state.lead_suit = None
 
-                # Check if the game is over
+                # Check if this is the final hand
                 if len(game_state.active_player.hand) == 1:
                     
                     # Play the final trick
@@ -98,9 +94,12 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
 
                     for player in game_state.players:
                         game_state.trick.append((player, player.hand[0]))
+                        player.hand = []
 
                     assign_trick()
 
+                # Check if this is the final hand
+                if len(game_state.active_player.hand) == 0:
                     game_state.is_game_over = True
                     return
 
@@ -121,7 +120,7 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
                     game_state.winning_team = game_state.opponents
 
                 # Debug code
-                #self.game += 1
+                self.game += 1
                 #print("Game: " + str(self.game) +
                 #      " Winners: " + game_state.winning_team.name +
                 #      " Points: " + str(game_state.winning_team.points))
@@ -141,6 +140,13 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
                 else:
                     game_state.winning_team = game_state.opponents
 
+                # Debug code
+                self.game += 1
+                #print("Max Depth Reached: " + str(game_state.depth) +
+                #      " Game: " + str(self.game) +
+                #      " Winners: " + game_state.winning_team.name +
+                #      " Points: " + str(game_state.winning_team.points))
+
                 #TODO: Calculate the strenth of the players hand
 
                 return (None, game_state)
@@ -152,18 +158,20 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
                 # If the game is over, return final score
                 if game_state.is_game_over: return game_end_upkeap(game_state)
 
-                if game_state.depth > self.max_depth: return max_depth_upkeap(game_state)
+                if game_state.depth >= max_depth: return max_depth_upkeap(game_state)
 
                 # Determine the next player
                 game_state.active_player = game_state.players_in_order[game_state.active_player_index]
 
                 # Find the cards the player is allowed to play
                 valid_cards = find_valid_cards(game_state.active_player.hand, game_state.lead_suit)
-                best_card = min(valid_cards, key= lambda c: c.points)
+                try:
+                    best_card = min(valid_cards, key= lambda c: c.points)
+                except:
+                    print(game_state.active_player.hand)
 
                 # Determine what card leads to the best possible outcome for the game
                 greatest_point_delta = 0
-
                 for card in valid_cards:
                     # Create a copy of the game state to represent the next node in the game tree
                     # and determine the lead suit of the trick
@@ -176,6 +184,7 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
                     for card_in_hand in next_state.active_player.hand:
                         if card_in_hand.suit == card.suit and card_in_hand.rank == card.rank:
                             next_state.active_player.hand.remove(card_in_hand)
+                            break
                     
                     next_state.active_player_index += 1
 
@@ -201,4 +210,24 @@ class MinMaxAIPlayer(Player): # Inherit from the Player class
 
             return play(game_state)[0]
         
-        return min_max(game_state)
+        card_to_play = min_max(game_state)
+
+        # Remove the card from the player's hand 
+        for card in self.hand:
+            if card.suit == card_to_play.suit and card.rank == card_to_play.rank:
+                card_to_play == card
+                self.hand.remove(card)
+                break
+
+        time_total = time.time() - start_time
+
+        time_minutes = math.floor(time_total / 60)
+        time_seconds = math.floor(time_total % 60)
+        time_miliseconds = math.floor((time_total % 60 - math.floor(time_total % 60)) * 100)
+
+        print(f"\n{card_to_play.__repr__()} found in {str(self.game)} attempts")
+        print(f"Card found in {time_minutes:02d}:{time_seconds:02d}:{time_miliseconds:02d}")
+
+        self.data.extend([time_total, self.game])
+
+        return card_to_play
